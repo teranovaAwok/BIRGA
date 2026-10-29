@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIRGA - Bilim Baholash Platformasi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --primary: #9333ea;
+    --primary-dark: #7c3aed;
+    --primary-light: #a855f7;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --dark: #1a1a2e;
+    --gray: #6b7280;
+    --light: #f9fafb;
+    --border: #e5e7eb;
+    --bg: #ffffff;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+  
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  
+  .header {
+    background: var(--bg);
+    padding: 15px 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .logo { font-size: 2rem; font-weight: 900; color: var(--primary); }
+  .logo span { color: var(--dark); }
+  
+  .btn {
+    padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 1rem;
+    cursor: pointer; border: none; transition: all 0.3s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white; box-shadow: 0 8px 25px rgba(147, 51, 234, 0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(147, 51, 234, 0.4); }
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+  .btn-secondary { background: var(--bg); color: var(--dark); border: 2px solid var(--border); }
+  
+  .subjects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+  
+  .subject-card {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    border: 3px solid transparent; border-radius: 20px; padding: 25px;
+    cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .subject-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(147, 51, 234, 0.25); }
+  .subject-card.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+  }
+  .subject-icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .subject-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+  .subject-count { font-size: 0.9rem; opacity: 0.85; }
+  
+  .card { background: var(--bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 20px; }
+  
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+  .progress-bar { flex: 1; height: 12px; background: var(--border); border-radius: 10px; overflow: hidden; min-width: 200px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); transition: width 0.5s; }
+  .quiz-stats { display: flex; gap: 15px; font-weight: 600; }
+  
+  .question-card { background: linear-gradient(135deg, var(--light) 0%, #f3e8ff 100%); border-radius: 20px; padding: 30px; margin-bottom: 20px; }
+  .question-number { display: inline-block; background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; }
+  .question-text { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; }
+  
+  .options-list { display: flex; flex-direction: column; gap: 12px; }
+  .option {
+    background: var(--bg); border: 2px solid var(--border); border-radius: 15px;
+    padding: 16px 20px; cursor: pointer; transition: all 0.3s;
+    display: flex; align-items: center; gap: 15px; font-size: 1.05rem;
+  }
+  .option:hover { border-color: var(--primary); transform: translateX(5px); }
+  .option.selected { border-color: var(--primary); background: #f3e8ff; }
+  .option-letter {
+    width: 35px; height: 35px; border-radius: 50%; background: var(--border);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;
+  }
+  .option.selected .option-letter { background: var(--primary); color: white; }
+  
+  .result-container { text-align: center; }
+  .result-circle {
+    width: 220px; height: 220px; border-radius: 50%; margin: 0 auto 30px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; background: var(--bg); box-shadow: 0 10px 40px rgba(147, 51, 234, 0.2);
+  }
+  .result-circle::before {
+    content: ''; position: absolute; inset: -8px; border-radius: 50%; padding: 8px;
+    background: conic-gradient(var(--primary) 0deg, var(--primary-light) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .result-score { font-size: 4rem; font-weight: 900; color: var(--primary); line-height: 1; }
+  
+  .result-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin: 30px 0; }
+  .result-stat { background: var(--light); padding: 20px; border-radius: 15px; text-align: center; }
+  .result-stat-value { font-size: 2rem; font-weight: 900; color: var(--primary); }
+  .result-stat-label { font-size: 0.9rem; color: var(--gray); margin-top: 5px; }
+  
+  .ai-analysis {
+    background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+    color: white; border-radius: 20px; padding: 30px; margin: 30px 0; text-align: left;
+  }
+  .ai-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .ai-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  }
+  .ai-item {
+    background: rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 12px;
+    border-left: 4px solid var(--primary-light); margin-bottom: 12px;
+  }
+  .ai-item-title { font-weight: 700; margin-bottom: 5px; color: #fbbf24; }
+  
+  .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 25px; }
+  .hidden { display: none !important; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.5s ease; }
+  
+  @media (max-width: 600px) {
+    .auth-card { padding: 25px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">BIR<span>GA</span> </div>
+  </div>
+
+  <!-- Welcome Screen -->
+  <div id="welcomeScreen" class="fade-in">
+    <div class="card">
+      <h1 style="font-size: 2rem; margin-bottom: 10px; text-align: center;">🎯 Fan tanlang</h1>
+      <p style="color: var(--gray); margin-bottom: 25px; text-align: center;">Bilimingizni sinab ko'ring va AI tahlilini oling!</p>
+      
+      <div class="subjects-grid">
+        <div class="subject-card" onclick="selectSubject('math')">
+          <div class="subject-icon">🔢</div>
+          <div class="subject-name">Matematika</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+        <div class="subject-card" onclick="selectSubject('history')">
+          <div class="subject-icon">📚</div>
+          <div class="subject-name">Tarix</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+        <div class="subject-card" onclick="selectSubject('science')">
+          <div class="subject-icon">🔬</div>
+          <div class="subject-name">Tabiiy fanlar</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+        <div class="subject-card" onclick="selectSubject('it')">
+          <div class="subject-icon">💻</div>
+          <div class="subject-name">Informatika</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+        <div class="subject-card" onclick="selectSubject('english')">
+          <div class="subject-icon">🇬🇧</div>
+          <div class="subject-name">Ingliz tili</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+        <div class="subject-card" onclick="selectSubject('literature')">
+          <div class="subject-icon"></div>
+          <div class="subject-name">Adabiyot</div>
+          <div class="subject-count">10 savol • 5 daqiqa</div>
+        </div>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="startQuiz()" id="startBtn" disabled style="max-width: 300px;">
+          🚀 Testni boshlash
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quizScreen" class="hidden">
+    <div class="card fade-in">
+      <div class="quiz-header">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div class="quiz-stats">
+          <span id="questionCounter">1/10</span>
+          <span id="timer">⏱️ 00:00</span>
+        </div>
+      </div>
+      
+      <div class="question-card">
+        <div class="question-number" id="questionNumber">Savol 1</div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options-list" id="optionsList"></div>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="previousQuestion()" style="max-width: 150px;">⬅️ Oldingi</button>
+        <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="max-width: 150px;">Keyingi ➡️</button>
+        <button class="btn btn-success hidden" onclick="finishQuiz()" id="finishBtn" style="max-width: 200px;">✅ Yakunlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="resultScreen" class="hidden">
+    <div class="card result-container fade-in">
+      <h1 style="font-size: 2rem; margin-bottom: 20px;">🎉 Test yakunlandi!</h1>
+      
+      <div class="result-circle">
+        <div class="result-score" id="resultScore">0%</div>
+        <div style="color: var(--gray);">Natija</div>
+      </div>
+      
+      <div id="resultMessage" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;"></div>
+      <div id="resultDetails" style="color: var(--gray); margin-bottom: 30px;"></div>
+      
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-value" id="correctCount">0</div>
+          <div class="result-stat-label">✅ To'g'ri</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" id="wrongCount">0</div>
+          <div class="result-stat-label">❌ Noto'g'ri</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" id="timeSpent">0:00</div>
+          <div class="result-stat-label">⏱️ Vaqt</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" id="grade">A</div>
+          <div class="result-stat-label">📊 Baho</div>
+        </div>
+      </div>
+      
+      <div class="ai-analysis" id="aiAnalysis">
+        <div class="ai-header">
+          <div class="ai-icon">🤖</div>
+          <div>
+            <div style="font-size: 1.3rem; font-weight: 700;">AI Tahlil</div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">Sun'iy intellekt natijangizni tahlil qilmoqda...</div>
+          </div>
+        </div>
+        <div id="aiContent"></div>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="restartQuiz()" style="max-width: 250px;">🔄 Qayta boshlash</button>
+        <button class="btn btn-secondary" onclick="showWelcome()" style="max-width: 200px;">🏠 Bosh sahifa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const questions = {
+    math: [
+      { q: "2 + 2 × 2 = ?", options: ["6", "8", "4", "10"], correct: 0 },
+      { q: "15 ning 20% i nechaga teng?", options: ["2", "3", "4", "5"], correct: 1 },
+      { q: "Kvadratning perimetri 24 sm. Tomoni nechaga teng?", options: ["4 sm", "6 sm", "8 sm", "12 sm"], correct: 1 },
+      { q: "√144 = ?", options: ["10", "11", "12", "14"], correct: 2 },
+      { q: "3x + 5 = 20. x = ?", options: ["3", "4", "5", "6"], correct: 2 },
+      { q: "1 km = ? metr", options: ["100", "500", "1000", "10000"], correct: 2 },
+      { q: "Doira yuzasi formulasi?", options: ["πr²", "2πr", "πd", "r²"], correct: 0 },
+      { q: "12 ning 3 ga bo'lganda qoldiq?", options: ["0", "1", "2", "3"], correct: 0 },
+      { q: "Eng kichik tub son?", options: ["0", "1", "2", "3"], correct: 2 },
+      { q: "45° + 45° = ?", options: ["80°", "90°", "100°", "180°"], correct: 1 }
+    ],
+    history: [
+      { q: "Amir Temur qachon tug'ilgan?", options: ["1336", "1342", "1350", "1360"], correct: 0 },
+      { q: "O'zbekiston mustaqilligi qachon e'lon qilingan?", options: ["1990", "1991", "1992", "1993"], correct: 1 },
+      { q: "Buyuk Ipak yo'li qaysi asrlarda faol bo'lgan?", options: ["I-V", "VI-X", "XI-XV", "XVI-XX"], correct: 1 },
+      { q: "Alisher Navoiy qachon yashagan?", options: ["1441-1501", "1450-1510", "1430-1490", "1460-1520"], correct: 0 },
+      { q: "Samarqand qachon poytaxt bo'lgan?", options: ["Temuriylar davrida", "Qadimda", "Sovet davrida", "Mustaqillikdan keyin"], correct: 0 },
+      { q: "Buxoro amirligi qachon tugatilgan?", options: ["1917", "1920", "1924", "1930"], correct: 1 },
+      { q: "O'zbekiston BMT ga qachon qo'shilgan?", options: ["1991", "1992", "1993", "1994"], correct: 1 },
+      { q: "Mirzo Ulug'bek rasadxonasi qayerda?", options: ["Buxoro", "Samarqand", "Xiva", "Toshkent"], correct: 1 },
+      { q: "Ikkinchi jahon urushi qachon tugagan?", options: ["1943", "1944", "1945", "1946"], correct: 2 },
+      { q: "O'zbekistonning birinchi prezidenti?", options: ["I. Karimov", "S. Mirziyoyev", "A. Mutalov", "F. Xo'jayev"], correct: 0 }
+    ],
+    science: [
+      { q: "Suvning kimyoviy formulasi?", options: ["H2O", "CO2", "O2", "H2"], correct: 0 },
+      { q: "Yer Quyosh atrofida aylanish davri?", options: ["24 soat", "30 kun", "365 kun", "10 yil"], correct: 2 },
+      { q: "Eng katta sayyora?", options: ["Yer", "Mars", "Yupiter", "Saturn"], correct: 2 },
+      { q: "Fotosintez jarayoni qayerda bo'ladi?", options: ["Ildizda", "Poyada", "Bargda", "Gulda"], correct: 2 },
+      { q: "Inson tanasida nechta suyak bor?", options: ["106", "206", "306", "406"], correct: 1 },
+      { q: "Elektr tokini o'lchash birligi?", options: ["Volt", "Amper", "Om", "Vatt"], correct: 1 },
+      { q: "Eng yengil gaz?", options: ["Kislorod", "Azot", "Vodorod", "Geliy"], correct: 2 },
+      { q: "Quyosh sistemasida nechta sayyora bor?", options: ["7", "8", "9", "10"], correct: 1 },
+      { q: "DNA nima?", options: ["Oqsil", "Nuklein kislota", "Yog'", "Uglevod"], correct: 1 },
+      { q: "Yorug'lik tezligi?", options: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "1,000,000 km/s"], correct: 0 }
+    ],
+    it: [
+      { q: "HTML nima?", options: ["Dasturlash tili", "Belgilash tili", "Ma'lumotlar bazasi", "Operatsion tizim"], correct: 1 },
+      { q: "CPU nima?", options: ["Xotira", "Protsessor", "Monitor", "Klaviatura"], correct: 1 },
+      { q: "1 GB = ? MB", options: ["100", "512", "1000", "1024"], correct: 3 },
+      { q: "Internet protokoli?", options: ["HTTP", "FTP", "TCP/IP", "SMTP"], correct: 2 },
+      { q: "Python nima?", options: ["Ilon", "Dasturlash tili", "O'yin", "Brauzer"], correct: 1 },
+      { q: "RAM nima?", options: ["Doimiy xotira", "Tezkor xotira", "Tashqi xotira", "Video xotira"], correct: 1 },
+      { q: "WWW nima?", options: ["World Wide Web", "Web World Wide", "Wide World Web", "Web Wide World"], correct: 0 },
+      { q: "CSS nima uchun ishlatiladi?", options: ["Dasturlash", "Dizayn", "Ma'lumotlar bazasi", "Server"], correct: 1 },
+      { q: "Binary tizimda nechta raqam bor?", options: ["2", "8", "10", "16"], correct: 0 },
+      { q: "GitHub nima?", options: ["O'yin", "Kod saqlash platformasi", "Brauzer", "Antivirus"], correct: 1 }
+    ],
+    english: [
+      { q: "'Book' so'zining ko'pligi?", options: ["Books", "Bookes", "Book's", "Booking"], correct: 0 },
+      { q: "'I ___ a student' - to'g'ri fe'l?", options: ["is", "am", "are", "be"], correct: 1 },
+      { q: "'Beautiful' so'zining antonimi?", options: ["Pretty", "Ugly", "Nice", "Good"], correct: 1 },
+      { q: "'Yesterday' qaysi zamon?", options: ["Present", "Future", "Past", "Perfect"], correct: 2 },
+      { q: "'She ___ to school every day'", options: ["go", "goes", "going", "gone"], correct: 1 },
+      { q: "'Apple' so'zi qanday ot?", options: ["Abstract", "Proper", "Common", "Collective"], correct: 2 },
+      { q: "'Can' modal fe'li nima bildiradi?", options: ["Imkoniyat", "Majburiyat", "Istak", "Buyruq"], correct: 0 },
+      { q: "'Run' fe'lining 2-shakli?", options: ["Runned", "Running", "Ran", "Runs"], correct: 2 },
+      { q: "'The' artikli qachon ishlatiladi?", options: ["Aniq ot bilan", "Noma'lum ot bilan", "Fe'l bilan", "Sifat bilan"], correct: 0 },
+      { q: "'How are you?' savoliga javob?", options: ["I'm fine", "I'm 20", "I'm student", "I'm here"], correct: 0 }
+    ],
+    literature: [
+      { q: "'Boburnoma' muallifi?", options: ["Alisher Navoiy", "Zahiriddin Muhammad Bobur", "Amir Temur", "Mirzo Ulug'bek"], correct: 1 },
+      { q: "'Xamsa' asari muallifi?", options: ["Firdavsiy", "Alisher Navoiy", "Rudakiy", "Jomiy"], correct: 1 },
+      { q: "'O'tkan kunlar' romani muallifi?", options: ["Abdulla Qodiriy", "Cho'lpon", "Fitrat", "Hamza"], correct: 0 },
+      { q: "'Mehrobdan chayon' muallifi?", options: ["Abdulla Qodiriy", "Cho'lpon", "Abdulla Qahhor", "Oybek"], correct: 1 },
+      { q: "'Shum bola' qissasi muallifi?", options: ["G'afur G'ulom", "Abdulla Qahhor", "Oybek", "Said Ahmad"], correct: 1 },
+      { q: "Navoiyning asl ismi?", options: ["Nizomiddin", "Ali", "Muhammad", "Zahiriddin"], correct: 0 },
+      { q: "'Layli va Majnun' dostoni muallifi?", options: ["Firdavsiy", "Navoiy", "Jomiy", "Rudakiy"], correct: 1 },
+      { q: "'O'zbek xalq og'zaki ijodi' nima?", options: ["Yozma adabiyot", "Xalq og'zaki ijodi", "Zamonaviy adabiyot", "Tarjima"], correct: 1 },
+      { q: "'Alpomish' dostoni qaysi xalqqa tegishli?", options: ["Qozoq", "Qirg'iz", "O'zbek", "Tojik"], correct: 2 },
+      { q: "Navoiy qaysi tilda ham ijod qilgan?", options: ["Arab", "Fors", "Turk", "Rus"], correct: 1 }
+    ]
+  };
+
+  const subjectNames = {
+    math: 'Matematika', history: 'Tarix', science: 'Tabiiy fanlar',
+    it: 'Informatika', english: 'Ingliz tili', literature: 'Adabiyot'
+  };
+
+  // Foydalanuvchi avtomatik kiradi
+  let currentUser = { name: 'Mehmon', email: 'demo@birga.uz', grade: 'Mehmon' };
+  let currentSubject = '';
+  let currentQuestion = 0;
+  let answers = [];
+  let timer = 0;
+  let timerInterval;
+
+  function showWelcome() {
+    document.getElementById('welcomeScreen').classList.remove('hidden');
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
+    clearInterval(timerInterval);
+  }
+
+  function selectSubject(subject) {
+    currentSubject = subject;
+    document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('startBtn').disabled = false;
+  }
+
+  function startQuiz() {
+    if (!currentSubject) { alert('⚠️ Iltimos, fan tanlang!'); return; }
+    currentQuestion = 0;
+    answers = new Array(questions[currentSubject].length).fill(-1);
+    timer = 0;
+    document.getElementById('welcomeScreen').classList.add('hidden');
+    document.getElementById('quizScreen').classList.remove('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
+    startTimer();
+    showQuestion();
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timer++;
+      const minutes = Math.floor(timer / 60);
+      const seconds = timer % 60;
+      document.getElementById('timer').textContent = `️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+
+  function showQuestion() {
+    const q = questions[currentSubject][currentQuestion];
+    const total = questions[currentSubject].length;
+    document.getElementById('questionNumber').textContent = `Savol ${currentQuestion + 1}`;
+    document.getElementById('questionText').textContent = q.q;
+    document.getElementById('questionCounter').textContent = `${currentQuestion + 1}/${total}`;
+    document.getElementById('progressFill').style.width = `${((currentQuestion + 1) / total) * 100}%`;
+    const optionsList = document.getElementById('optionsList');
+    optionsList.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    q.options.forEach((option, index) => {
+      const optionDiv = document.createElement('div');
+      optionDiv.className = 'option';
+      if (answers[currentQuestion] === index) optionDiv.classList.add('selected');
+      optionDiv.onclick = () => selectOption(index);
+      optionDiv.innerHTML = `<div class="option-letter">${letters[index]}</div><div>${option}</div>`;
+      optionsList.appendChild(optionDiv);
+    });
+    document.getElementById('nextBtn').classList.toggle('hidden', currentQuestion === total - 1);
+    document.getElementById('finishBtn').classList.toggle('hidden', currentQuestion !== total - 1);
+  }
+
+  function selectOption(index) { answers[currentQuestion] = index; showQuestion(); }
+  function nextQuestion() { if (currentQuestion < questions[currentSubject].length - 1) { currentQuestion++; showQuestion(); } }
+  function previousQuestion() { if (currentQuestion > 0) { currentQuestion--; showQuestion(); } }
+
+  function generateAIAnalysis(percentage, correct, total, timeSpent, subject) {
+    const subjectName = subjectNames[subject];
+    let level, emoji, strengths, weaknesses, recommendations;
+    if (percentage >= 90) {
+      level = "A'lo"; emoji = "🌟";
+      strengths = `${subjectName} bo'yicha chuqur bilimga egasiz!`;
+      weaknesses = "Bilimingiz deyarli mukammal.";
+      recommendations = ["Olimpiadalarga tayyorlaning!", "Tengdoshlaringizga yordam bering", "Xalqaro tanlovlarda qatnashing"];
+    } else if (percentage >= 75) {
+      level = "Yaxshi"; emoji = "👍";
+      strengths = `${subjectName} bo'yicha mustahkam asosga egasiz.`;
+      weaknesses = "Ba'zi mavzularda bilimni chuqurlashtirish kerak.";
+      recommendations = ["Noto'g'ri javob bergan mavzularni qayta o'rganing", "Har kuni 30 daqiqa shug'ullaning", "Amaliy mashqlar bajaring"];
+    } else if (percentage >= 60) {
+      level = "Qoniqarli"; emoji = "✓";
+      strengths = "Asosiy tushunchalarni bilasiz.";
+      weaknesses = "Ba'zi mavzularda zaif tomonlar bor.";
+      recommendations = ["Darslikdagi asosiy mavzularni qayta o'qing", "Video darslar ko'ring", "Do'stlaringiz bilan birgalikda o'rganing"];
+    } else if (percentage >= 40) {
+      level = "O'rtacha"; emoji = "📚";
+      strengths = "Ba'zi asosiy tushunchalarni bilasiz.";
+      weaknesses = "Ko'p mavzularda bilim yetishmayapti.";
+      recommendations = ["Darslikni boshidan o'qing", "Repetitor yoki onlayn kurslarga yoziling", "Har hafta kamida 2 marta test yeching"];
+    } else {
+      level = "Past"; emoji = "💪";
+      strengths = "Sizda o'rganishga bo'lgan istak bor!";
+      weaknesses = "Hozircha bilim darajasi past. Lekin bu o'zgarishi mumkin!";
+      recommendations = ["Asoslarni noldan o'rganing", "O'qituvchingizdan yordam so'rang", "Har kuni 15-20 daqiqa mashq qiling"];
+    }
+    return { level, emoji, strengths, weaknesses, recommendations,
+      message: `${emoji} Siz ${subjectName} bo'yicha "${level}" darajadasiz!` };
+  }
+
+  function finishQuiz() {
+    clearInterval(timerInterval);
+    let correct = 0;
+    questions[currentSubject].forEach((q, index) => { if (answers[index] === q.correct) correct++; });
+    const total = questions[currentSubject].length;
+    const percentage = Math.round((correct / total) * 100);
+    const wrong = total - correct;
+    let grade;
+    if (percentage >= 90) grade = 'A+';
+    else if (percentage >= 80) grade = 'A';
+    else if (percentage >= 70) grade = 'B';
+    else if (percentage >= 60) grade = 'C';
+    else if (percentage >= 50) grade = 'D';
+    else grade = 'F';
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const analysis = generateAIAnalysis(percentage, correct, total, timer, currentSubject);
+    document.getElementById('resultScore').textContent = `${percentage}%`;
+    document.getElementById('resultMessage').textContent = analysis.message;
+    document.getElementById('resultDetails').textContent = `Siz ${total} savoldan ${correct} tasiga to'g'ri javob berdingiz`;
+    document.getElementById('correctCount').textContent = correct;
+    document.getElementById('wrongCount').textContent = wrong;
+    document.getElementById('timeSpent').textContent = timeStr;
+    document.getElementById('grade').textContent = grade;
+    const aiContent = document.getElementById('aiContent');
+    aiContent.innerHTML = '';
+    const items = [
+      { title: '📊 Umumiy baho', text: `${analysis.emoji} Daraja: ${analysis.level} (${percentage}%)` },
+      { title: '💪 Kuchli tomonlar', text: analysis.strengths },
+      { title: '⚠️ Zaif tomonlar', text: analysis.weaknesses },
+      { title: '🎯 Tavsiyalar', text: analysis.recommendations.map((r, i) => `${i+1}. ${r}`).join('<br>') }
+    ];
+    for (const item of items) {
+      const div = document.createElement('div');
+      div.className = 'ai-item fade-in';
+      div.innerHTML = `<div class="ai-item-title">${item.title}</div><div class="ai-item-text">${item.text}</div>`;
+      aiContent.appendChild(div);
+    }
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+  }
+
+  function restartQuiz() { startQuiz(); }
+
+  // Sayt ochilishi bilan darhol ishga tushadi
+  window.onload = function() {
+    showWelcome();
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "8-A sinf",
+    "members": 24,
+    "activeMembers": 12,
+    "projects": 3,
+    "description": "Faol ijtimoiy tashabbuslar guruhi",
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "name": "9-B sinf",
+    "members": 28,
+    "activeMembers": 15,
+    "projects": 5,
+    "description": "Ekologik va madaniy loyihalar",
+    "status": "active"
+  },
+  {
+    "id": 3,
+    "name": "10-A sinf",
+    "members": 22,
+    "activeMembers": 10,
+    "projects": 2,
+    "description": "IT va raqamli loyihalar",
+    "status": "active"
+  }
+]

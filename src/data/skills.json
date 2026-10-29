@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Liderlik",
+    "icon": "Users",
+    "description": "Jamoani boshqarish va motivatsiya qilish ko'nikmasi",
+    "level": "Boshlang'ich"
+  },
+  {
+    "id": 2,
+    "title": "Jamoaviy ish",
+    "icon": "Handshake",
+    "description": "Birgalikda muammolarni hal qilish",
+    "level": "O'rta"
+  },
+  {
+    "id": 3,
+    "title": "Ommaviy nutq",
+    "icon": "Mic",
+    "description": "Omma oldida ishonchli gapirish",
+    "level": "Boshlang'ich"
+  },
+  {
+    "id": 4,
+    "title": "Loyiha boshqaruvi",
+    "icon": "Briefcase",
+    "description": "G'oyani rejalashtirish va amalga oshirish",
+    "level": "O'rta"
+  },
+  {
+    "id": 5,
+    "title": "Raqamli savodxonlik",
+    "icon": "Laptop",
+    "description": "Texnologiyalardan samarali foydalanish",
+    "level": "Boshlang'ich"
+  },
+  {
+    "id": 6,
+    "title": "Konfliktlarni hal qilish",
+    "icon": "Scale",
+    "description": "Nizolarni tinch yo'l bilan hal etish",
+    "level": "O'rta"
+  }
+]
